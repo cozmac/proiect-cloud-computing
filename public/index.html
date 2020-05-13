@@ -1,0 +1,79 @@
+<html>
+    
+    <script>
+    var lat;
+    var lon;
+    
+        function parseIPJSON(){
+            if(this.readyState == 4 && this.status == 200){
+                var ip_json = JSON.parse(this.responseText);
+                console.log(ip_json);
+                var city = ip_json.city;
+                var country = ip_json.country;
+                var isp = ip_json.isp;
+                var region = ip_json.region;
+                var timezone = ip_json.timezone;
+                var output = "You live in " + city + ", " + country +". Your internet provider is " + isp + ". Your car number starts with " + region + ". Your timezone is " + timezone + ".";
+                document.getElementById("ip_details").innerHTML=output;
+                
+                lat = ip_json.lat;
+                lon = ip_json.lon;
+                lonlat();
+            }
+        }
+        
+        function parseSunset(){
+            if(this.readyState == 4 && this.status == 200){
+                var json_sunset = JSON.parse(this.responseText);
+                console.log("aici");
+                console.log(json_sunset);
+                var output = "In your region, the sunrise is at: " + json_sunset.results.sunrise + ", the sunset is at: " + json_sunset.results.sunset + " (UTC TIME)."
+                console.log(output);
+                document.getElementById("sunset").innerHTML = output;
+            }
+        }
+        
+        
+        function test(){
+            var x = document.getElementById("ip_search").value;
+            var myRequest = new XMLHttpRequest();
+            myRequest.overrideMimeType("application/json");
+            myRequest.onreadystatechange = parseIPJSON;
+            myRequest.open("POST", "/ip", true);
+            myRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+            myRequest.send(JSON.stringify({data: x}));
+            console.log(myRequest);
+        }
+        
+        function lonlat(){
+            var myRequest = new XMLHttpRequest();
+            myRequest.overrideMimeType("application/json");
+            myRequest.onreadystatechange = parseSunset;
+            myRequest.open("POST", "/sunset", true);
+            myRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+            myRequest.send(JSON.stringify({data1:lat, data2:lon}));
+            console.log(myRequest);
+        }
+        </script>
+    
+<body>
+<head>
+    <title>Cristian Cozma</title>
+    <h1>Cristian Cozma</h1>
+</head>
+
+<div id="content">
+        <div id="Panel">
+            <form action="#" id="search_form">
+                <!--<input type="text" name="search" id="ip_search" onclick="test()" /> <input type="submit" value="Search" />-->
+                <input type="text" id="ip_search" name="search"> <button onclick="test()">Track</button>
+            </form>
+            <div id="IP">
+                <h2 id="ip_details">Search for an IP to see more details about it</h2>
+                <br>
+                <label id="sunset">API 2</label>
+            </div>
+        </div>
+
+</body>
+</html>
